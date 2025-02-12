@@ -8,17 +8,16 @@ from src.exception import CustomException
 from src.logger import logging
 from src.utils.main_utils import MainUtils
 from dataclasses import dataclass
-from src.constant import MONGO_COLLECTION_NAME,MONGO_DATABASE_NAME,MONGO_DB_URL,artifact_folder
+from src.constant import *
 
 
 
 @dataclass
 class DataIngestionConfig:
-    artifact_folder : str = os.path(artifact_folder)
+    artifact_folder : str = os.path.join(artifact_folder)
     
 class DataIngestion:
     def __init__(self):
-        pass
         self.data_ingestion_config =  DataIngestionConfig()
         self.utils = MainUtils()
         
@@ -29,12 +28,13 @@ class DataIngestion:
             
             collection = mongo_client[db_name][collection_name]
             
-            df = pd.Dataframe(list(collection.find()))
+            df = pd.DataFrame(list(collection.find()))
             
-            if "id" in df.columns.to_list():
-                df = df.drop(columns = ['id'],axis = 1)
+            if "_id" in df.columns.to_list():
+                df = df.drop(columns = ['_id'],axis = 1)
             
             df.replace({"na" : np.nan},inplace = True)
+            
             return df
         except Exception as e:
             raise CustomException(e,sys)
