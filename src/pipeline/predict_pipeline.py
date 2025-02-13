@@ -24,27 +24,30 @@ class PredictionPipeline:
         self.utils = MainUtils()
         self.prediction_pipeline_config = PredictionPipelineConfig()
         
-    def save_input_files(self)-> str:
+    def save_input_files(self) -> str:
         try:
-            pred_file_input_dir = 'prediction_artifacts'
-            os.makedirs(pred_file_input_dir,exist_ok=True)
+            pred_file_input_dir = "prediction_artifacts"
             
-            input_csv_file = self.request.files['file']
-            pred_file_path = os.path.join(pred_file_input_dir,input_csv_file.filename)
-            
-            input_csv_file.save(pred_file_path)
-            
+            # Ensure directory exists before saving the file
+            os.makedirs(pred_file_input_dir, exist_ok=True)
+
+            input_csv_file = self.request.files["file"]
+            pred_file_path = os.path.join(pred_file_input_dir, input_csv_file.filename)
+
+            input_csv_file.save(pred_file_path)  # ✅ Now the folder should exist
+
             return pred_file_path
-        
+
         except Exception as e:
-            raise CustomException(e,sys)     
+            raise CustomException(e, sys)  # ✅ Correct exception handling
+     
     
     def predict(self , features):
         try:
             model = self.utils.load_object(self.prediction_pipeline_config.model_file_path)
             preprocessor = self.utils.load_object(file_path=self.prediction_pipeline_config.preprocessor_path)
             
-            transformed_x = preprocessor.tranform(features)
+            transformed_x = preprocessor.transform(features)  # ✅ Correct spelling
             
             preds = model.predict(transformed_x)
             
@@ -84,5 +87,5 @@ class PredictionPipeline:
             
             return self.prediction_pipeline_config
         except Exception as e:
-            raise CustomException
+            raise CustomException(e,sys)
         
